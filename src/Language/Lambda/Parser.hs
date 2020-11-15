@@ -15,7 +15,7 @@ expr :: Parser (LambdaExpr String)
 expr = try app <|> term
 
 term :: Parser (LambdaExpr String)
-term = let' <|> abs <|> var <|> parens
+term = let' <|> abs <|> var <|> parens <|> numeral
 
 var :: Parser (LambdaExpr String)
 var = Var <$> identifier
@@ -51,3 +51,9 @@ symbol = void . lexeme . char
 
 keyword :: String -> Parser ()
 keyword = void . lexeme . string
+
+numeral :: Parser (LambdaExpr String)
+numeral = church <$> lexeme digit
+    where
+        church '0' = Abs "f" (Abs "x" (Var "x"))
+        church '1' = Abs "f" (Abs "x" (App (Var "f") (Var "x")))
