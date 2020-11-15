@@ -57,3 +57,4 @@ numeral = church <$> lexeme digit
     where
         church '0' = Abs "f" (Abs "x" (Var "x"))
         church '1' = Abs "f" (Abs "x" (App (Var "f") (Var "x")))
+        church n = Abs "f" (Abs "x" (foldr (App) (Var "x") (replicate (read [n]) (Var "f"))))
