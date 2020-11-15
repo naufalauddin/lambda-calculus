@@ -59,9 +59,11 @@ numeral = church <$> lexeme digit
         church '1' = Abs "f" (Abs "x" (App (Var "f") (Var "x")))
         church n = Abs "f" (Abs "x" (foldr (App) (Var "x") (replicate (read [n]) (Var "f"))))
 
+plus :: Parser (LambdaExpr String)
 plus = plus' <$> lexeme (char '+')
     where plus' _ = Abs "m" (Abs "n" (Abs "f" (Abs "x" ( App (App (Var "m") (Var "f")) (App (App (Var "n") (Var "f")) (Var "x"))))))
 
+mult :: Parser (LambdaExpr String)
 mult = mult' <$> lexeme (char '*')
     where mult' _ = Abs "m" (Abs "n" (Abs "f" (Abs "x" (App (App (Var "m") (App (Var "n") (Var "f"))) (Var "x")))))
 
