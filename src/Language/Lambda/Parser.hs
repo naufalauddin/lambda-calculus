@@ -15,7 +15,7 @@ expr :: Parser (LambdaExpr String)
 expr = try app <|> term
 
 term :: Parser (LambdaExpr String)
-term = let' <|> abs <|> var <|> parens <|> numeral
+term = let' <|> abs <|> var <|> parens <|> numeral <|> plus
 
 var :: Parser (LambdaExpr String)
 var = Var <$> identifier
@@ -58,3 +58,6 @@ numeral = church <$> lexeme digit
         church '0' = Abs "f" (Abs "x" (Var "x"))
         church '1' = Abs "f" (Abs "x" (App (Var "f") (Var "x")))
         church n = Abs "f" (Abs "x" (foldr (App) (Var "x") (replicate (read [n]) (Var "f"))))
+
+plus = plus' <$> lexeme (char '+')
+    where plus' _ = Abs "m" (Abs "n" (Abs "f" (Abs "x" ( App (App (Var "m") (Var "f")) (App (App (Var "n") (Var "f")) (Var "x"))))))
