@@ -13,25 +13,42 @@ data LambdaExpr name
   deriving (Eq, Show)
 
 -- Pretty printing
-instance PrettyPrint a => PrettyPrint (LambdaExpr a) where
-  prettyPrint = prettyPrint . pprExpr empty
+instance (PrettyPrint a, Eq a) => PrettyPrint (LambdaExpr a) where
+  prettyPrint = prettyPrint . pprExpr' empty
 
 -- Pretty print a lambda expression
-pprExpr :: PrettyPrint n => PDoc String -> LambdaExpr n -> PDoc String
+pprExpr :: (PrettyPrint n, Eq n) => PDoc String -> LambdaExpr n -> PDoc String
 pprExpr pdoc (Var n)      = prettyPrint n `add` pdoc
 pprExpr pdoc (Abs n body) = pprAbs pdoc n body
 pprExpr pdoc (App e1 e2)  = pprApp pdoc e1 e2
 pprExpr pdoc (Let n expr) = pprLet pdoc n expr
 
+-- try to pretty print church numeral
+pprExpr' :: (PrettyPrint n, Eq n) => PDoc String -> LambdaExpr n -> PDoc String
+pprExpr' pdoc expr@(Abs a (Abs b body)) = guard (tryNumeral 0 a b body) (pprExpr pdoc expr)
+    where
+        guard Nothing a = a
+        guard (Just b) _ = (PDoc [(show b)]) `mappend` pdoc
+        tryNumeral n a b (App x y)
+            | (Var b) == y = Just (n+1)
+            | (Var a) == x = tryNumeral (n+1) a b y
+            | otherwise    = Nothing
+        tryNumeral n a b (Var x)
+            | b == x = Just n
+            | otherwise = Nothing
+        tryNumeral n a b _ = Nothing
+pprExpr' pdoc a = pprExpr pdoc a
+
 -- Pretty print an abstraction 
-pprAbs :: PrettyPrint n => PDoc String -> n -> LambdaExpr n -> PDoc String
+pprAbs :: (PrettyPrint n, Eq n) => PDoc String -> n -> LambdaExpr n -> PDoc String
 pprAbs pdoc n body
   = between vars' [lambda] ". " (pprExpr pdoc body')
   where (vars, body') = uncurry n body
         vars' = intercalate (map prettyPrint vars) " " empty
 
 -- Pretty print an application
-pprApp :: PrettyPrint n
+pprApp :: (PrettyPrint n,
+           Eq n)
         => PDoc String
         -> LambdaExpr n
         -> LambdaExpr n
@@ -47,7 +64,7 @@ pprApp pdoc e1@(Abs _ _) e2 = betweenParens (pprExpr pdoc e1) pdoc
 pprApp pdoc e1 e2
   = pprExpr pdoc e1 `mappend` addSpace (pprExpr pdoc e2)
 
-pprLet :: PrettyPrint n
+pprLet :: (PrettyPrint n, Eq n)
        => PDoc String
        -> n
        -> LambdaExpr n
