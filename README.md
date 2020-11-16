@@ -1,3 +1,37 @@
+# Building
+Untuk membangun aplikasi diperlukan:
+* GHC >= 8
+* stack
+
+Build:
+```
+stack build
+```
+
+Install:
+```
+stack install
+```
+
+# Running
+Setelah dibuild, maka program REPL dapat dijalankan dengan menjalankan
+```
+lambda-calculator
+```
+
+Setelah itu bisa langsung menuliskan ekspresi lambda yang ingin dievaluasi
+```
+Lambda Calculator (0.5.0)
+Type :h for help
+λ > \x. x
+λx. x
+λ > (\x. x) n
+n
+λ > (\n f x. f (n f x)) (\f x. f (f x))
+λf x. f (f (f x))
+λ > :q
+```
+
 # Pemahaman
 Lambda calculus adalah bahasa pemrograman terkecil yang terdiri tiga term,
 abstraksi, aplikasi, dan atom. Repo ini merupakan hasil dari eksplorasi
