@@ -53,11 +53,11 @@ keyword :: String -> Parser ()
 keyword = void . lexeme . string
 
 numeral :: Parser (LambdaExpr String)
-numeral = church <$> lexeme digit
+numeral = church <$> read <$> many1 digit <* whitespace
     where
-        church '0' = Abs "f" (Abs "x" (Var "x"))
-        church '1' = Abs "f" (Abs "x" (App (Var "f") (Var "x")))
-        church n = Abs "f" (Abs "x" (foldr (App) (Var "x") (replicate (read [n]) (Var "f"))))
+        church 0 = Abs "f" (Abs "x" (Var "x"))
+        church 1 = Abs "f" (Abs "x" (App (Var "f") (Var "x")))
+        church n = Abs "f" (Abs "x" (foldr (App) (Var "x") (replicate n (Var "f"))))
 
 plus :: Parser (LambdaExpr String)
 plus = pure plus' <* symbol '+'
