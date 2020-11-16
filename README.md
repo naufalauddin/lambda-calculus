@@ -28,6 +28,11 @@ menjadi bentuk lambda dari church numeral, seperti berikut `0 := \\f x. x,
 dengan memparse simbol (+) menjadi `\m n f x.m f (n f x)`, untuk operator
 kali (\*) menjadi `\m n f x.m (n f) x`.
 
+Selain modifikasi untuk parser, saya juga melakukan modifikasi pada print hasil
+evaluasi. Jika dapat dievaluasi menjadi church numeral, maka hasil lambda akan
+diprint menjadi sebuah angka, jika tidak akan tetap diprint sebagai *lambda
+expression*.
+
 # Credits
 repo ini di fork dari repo url berikut:
 [sgillespie/lambda-calculus](https://github.com/sgillespie/lambda-calculus)
